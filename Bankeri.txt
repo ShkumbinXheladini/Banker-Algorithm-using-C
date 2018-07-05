@@ -1,0 +1,86 @@
+#include<stdio.h>
+#include<curses.h>
+void main() {
+/*max 10 proc e 5 res*/
+	int k=0,output[10],d=0,t=0,ins[5],i,avail[5],allocated[10][5],need[10][5],MAX[10][5],pno,P[10],j,rz, count=0;
+	clear();/*CTRL + L ne console*/
+/*JEP nr te resurseve (A,B,C)
+rz -> nr of res*/
+	printf("\n Enter the number of resources : ");
+	scanf("%d", &rz);/*scan digit*/
+
+/*vlerat e inst A, B, C*/
+	printf("\n enter the max instances of each resources\n");
+	for (i=0;i<rz;i++) {
+		avail[i]=0;
+		printf("%c= ",(i+97));
+		scanf("%d",&ins[i]);
+	}
+
+/*JEP nr te proceseve P0-P4
+pno -> proc no*/
+	printf("\n Enter the number of processes : ");
+	scanf("%d", &pno);
+	printf("\n Enter the allocation matrix \n     ");
+
+	for (i=0;i<rz;i++)
+		printf(" %c",(i+97));/*0 + 97 = 'a' pra shtyp res me chars a....*/
+
+	printf("\n");
+/*PER SECILIN PRoces jep vlerat*/
+	for (i=0;i <pno;i++) {
+		P[i]=i;/*Pozita e proc i vendoset ne i; P vect paraqet pozitat finale, psh P[0] = 3 -> proc 0 exec i 4-ti me radhe*/
+		printf("P[%d]  ",P[i]);
+		for (j=0;j<rz;j++) {
+			scanf("%d",&allocated[i][j]);/*SHTO TE QELIA PERKATESE E PROCESIT ne alloc matrix VLEREN*/
+			avail[j]+=allocated[i][j];/*/kalkulo vleren e inst te rezervuara te resoursit*/
+		}
+	}
+
+
+
+	printf("\nEnter the MAX matrix \n     ");
+	for (i=0;i<rz;i++) {
+		printf(" %c",(i+97));
+		avail[i]=ins[i]-avail[i];/*SHKO ZBRITE VLEREN MAX te inst te res (psh a) me vlerat e rezervuara
+dmth avail = MAX - reserved*/
+	}
+	printf("\n");
+	for (i=0;i <pno;i++) {
+		printf("P[%d]  ",i);
+		for (j=0;j<rz;j++)
+		 	scanf("%d", &MAX[i][j]);
+	}
+
+
+/*EXEC i alg*/
+	printf("\n");
+	A: d=-1;/*Te gjitha proc jane ok*/
+	for (i=0;i <pno;i++) {
+		count=0;
+		t=P[i];
+		for (j=0;j<rz;j++) {
+			need[t][j] = MAX[t][j]-allocated[t][j];
+			if(need[t][j]<=avail[j])
+				 count++;/*x instc prej rz res jan ok*/
+		}
+		if(count==rz) {/*Nese te gjitha inst jane ok*/
+			output[k++]=P[i];/*Proc shtohet ne radhen e exec <p1, p3, ..>*/
+			for (j=0;j<rz;j++)
+				avail[j]+=allocated[t][j];
+		} else
+		 P[++d]=P[i];/*rrite d sepse ki proc jo ok, dhe proc zhvendoset nje pozite para per ciklin e ardhshem psh p2 kalon ne poz 3*/
+	}
+	if(d!=-1) {/*ka procese jo ok*/
+		pno=d+1;/*pno = nr te proc jo ok, + 1 sepse zero based vect*/
+		goto A;
+	}
+
+/*radha e proc e renditur*/
+	printf("\t <");
+	for (i=0;i<k;i++)
+		printf(" P[%d] ",output[i]);
+	
+printf(">");
+	getch();
+}
